@@ -23,8 +23,10 @@ A Python-based downloader for movies and TV shows from [Hoichoi.tv](https://www.
 ```bash
 git clone https://github.com/beenabird/Hoichoi-Ripper.git
 cd Hoichoi-Ripper
+```
 
-Install dependencies:
+## Install dependencies:
+```bash
 pip install -r requirements.txt
 ```
 
