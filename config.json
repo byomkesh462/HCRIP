@@ -1,0 +1,21 @@
+{
+  "CONTENT_API_URL": "https://prod-contents-api.hoichoi.dev/contents/api/v1/series",
+  "VIDEO_API_URL":   "https://prod-contents-api.hoichoi.dev/contents/api/v1/videos",
+  "SITEID_HEADER":   { "x-hoichoi-siteid": "hoichoitv" },
+  "DEFAULT_TAG":     "MyTag",
+  "LANG_SUB": {
+    "english": "eng",
+    "bengali": "ben",
+    "hindi":   "hin"
+  },
+  "LANG_AUD": {
+    "bn": "ben",
+    "en": "eng",
+    "hi": "hin"
+  },
+  "NAMING": {
+    "movie":         "{title}.{year}.{quality}.HC.WEB-DL.AAC2.0.H.264-{tag}.mkv",
+    "series_folder": "{title}.S{season:02d}.HC.WEB-DL.AAC2.0.H.264-{tag}",
+    "series_file":   "{title}.S{season:02d}E{episode:02d}.{episode_title}.{quality}.HC.WEB-DL.AAC2.0.H.264-{tag}.mkv"
+  }
+}
