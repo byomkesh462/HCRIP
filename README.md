@@ -50,7 +50,7 @@ python hoichoi.py "https://www.hoichoi.tv/movies/abc" --download
 python hoichoi.py "https://www.hoichoi.tv/shows/xyz" --download
 ```
 
-### 🔹 Use RAW MP4 (if available)
+### 🔹 Downlaod RAW MP4 (if available)
 ```bash
 python hoichoi.py "<hoichoi-url>" --download --raw
 ```
