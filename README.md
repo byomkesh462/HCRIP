@@ -1,5 +1,7 @@
 # Hoichoi Downloader
 
+> ⚠️ **This project is currently in BETA stage. Features may change and bugs may exist.**
+
 A Python-based downloader for movies and TV shows from [Hoichoi.tv](https://www.hoichoi.tv). It supports:
 
 - 🧠 Automatic metadata extraction
@@ -57,7 +59,7 @@ python hoichoi.py "https://www.hoichoi.tv/movies/abc" --download
 python hoichoi.py "https://www.hoichoi.tv/shows/xyz" --download
 ```
 
-### 🔹 Downlaod RAW MP4 (if available)
+### 🔹 Download RAW MP4 (if available)
 ```bash
 python hoichoi.py "<hoichoi-url>" --download --raw
 ```
@@ -81,3 +83,7 @@ python hoichoi.py "<url>" --download -o my_downloads --tag CUSTOM
 ## 📦 License
 
 MIT License — Free to use and modify.
+
+---
+
+💬 **Feel free to [open issues](https://github.com/beenabird/Hoichoi-Ripper/issues) or contribute via pull requests!**
