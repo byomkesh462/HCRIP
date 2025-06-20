@@ -18,6 +18,12 @@ A Python-based downloader for movies and TV shows from [Hoichoi.tv](https://www.
   - External tool: `mkvmerge` (from [MKVToolNix](https://mkvtoolnix.download/))
   - (Optional) `ffmpeg` for HLS merging
 
+## 📥 Clone this Repository
+
+```bash
+git clone https://github.com/beenabird/Hoichoi-Ripper.git
+cd Hoichoi-Ripper
+
 Install dependencies:
 ```bash
 pip install -r requirements.txt
