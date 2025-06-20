@@ -25,7 +25,6 @@ git clone https://github.com/beenabird/Hoichoi-Ripper.git
 cd Hoichoi-Ripper
 
 Install dependencies:
-```bash
 pip install -r requirements.txt
 ```
 
