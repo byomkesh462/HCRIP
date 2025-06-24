@@ -14,8 +14,8 @@
     "hi": "hin"
   },
   "NAMING": {
-    "movie":         "{title}.{year}.{quality}.HC.WEB-DL.AAC2.0.H.264-{tag}.mkv",
+    "movie":         "{title}.{year}.{lang_aud}.{quality}.HC.WEB-DL.H.264.AAC2.0-{tag}.mkv",
     "series_folder": "{title}.S{season:02d}.HC.WEB-DL.AAC2.0.H.264-{tag}",
-    "series_file":   "{title}.S{season:02d}E{episode:02d}.{episode_title}.{quality}.HC.WEB-DL.AAC2.0.H.264-{tag}.mkv"
+    "series_file":   "{title}.S{season:02d}E{episode:02d}.{episode_title}.{lang_aud}.{quality}.HC.WEB-DL.AAC2.0.H.264-{tag}.mkv"
   }
 }

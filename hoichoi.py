@@ -113,7 +113,15 @@ def fetch_audio_languages(cid: str) -> list:
     return arr.get("audioLanguages", [])
 
 def sanitize(s: str) -> str:
-    return re.sub(r'[\\/*?:"<>|,]', "", s).strip().replace(" ", ".")
+    # Remove disallowed special characters
+    s = re.sub(r'[\\/*?:"<>|,!\']', "", s)
+    # Replace spaces with dots
+    s = s.replace(" ", ".")
+    # Replace multiple dots with a single dot
+    s = re.sub(r'\.+', ".", s)
+    # Trim leading/trailing dots and non-word characters
+    s = re.sub(r'^[\W.]+|[\W.]+$', "", s)
+    return s
 
 def fetch_series_data(series_id: str) -> list:
     """Fetch all episodes for each season of a series."""
@@ -204,7 +212,7 @@ def download_and_mux(manifest_url: str, out_dir: str, context: dict, captions: l
     raw_q = getattr(dl.main, "selected_quality", "1080p")
     quality = f"{raw_q.split('x')[1]}p" if "x" in raw_q else raw_q
     tpl = MOVIE_TMPL if context["type"] == "movie" else SERIES_FILE_TPL
-    final_name = tpl.format(**{**context, "quality": quality})
+    final_name = tpl.format(**{**context, "quality": quality, "lang_aud": audio_lang or "unk"})
     mkv_out = os.path.join(out_dir, final_name)
 
     progress(mp4_in, mkv_out, audio_lang, srt_path, srt_lang)
@@ -347,7 +355,7 @@ def main():
                                         break
                                 audio_lang = LANG_AUD.get(auds[0].lower(), auds[0].lower()) if auds else None
                                 quality = "RAW"
-                                final_name = SERIES_FILE_TPL.format(**{**base, "quality": quality})
+                                final_name = SERIES_FILE_TPL.format(**{**base, "quality": quality, "lang_aud": audio_lang or "unk"})
                                 mkv_out = os.path.join(season_dir, final_name)
                                 progress(mp4_in, mkv_out, audio_lang, srt_path, srt_lang)
                                 try:
@@ -405,7 +413,7 @@ def main():
                         auds = fetch_audio_languages(cid)
                         audio_lang = LANG_AUD.get(auds[0].lower(), auds[0].lower()) if auds else None
                         quality = "RAW"
-                        tpl_ctx = {"type": "movie", "title": safe, "year": year, "quality": quality, "tag": args.tag}
+                        tpl_ctx = {"type": "movie", "title": safe, "year": year, "quality": quality, "tag": args.tag, "lang_aud": audio_lang or "unk"}
                         final_name = MOVIE_TMPL.format(**tpl_ctx)
                         mkv_out = os.path.join(args.output_dir, final_name)
                         progress(mp4_in, mkv_out, audio_lang, srt_path, srt_lang)
@@ -423,7 +431,8 @@ def main():
 
         caps = fetch_captions(cid)
         auds = fetch_audio_languages(cid)
-        download_and_mux(manifest, args.output_dir, {"type": "movie", "title": safe, "year": year, "tag": args.tag}, caps, auds, args.max_connections, args.mp4_connections, args.resolution)
+        audio_lang = LANG_AUD.get(auds[0].lower(), auds[0].lower()) if auds else None
+        download_and_mux(manifest, args.output_dir, {"type": "movie", "title": safe, "year": year, "tag": args.tag, "lang_aud": audio_lang or "unk"}, caps, auds, args.max_connections, args.mp4_connections, args.resolution)
 
 if __name__ == "__main__":
     main()
