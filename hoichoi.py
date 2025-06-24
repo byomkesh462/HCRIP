@@ -288,19 +288,14 @@ def main():
             for j, ep in enumerate(eps, start=1):
                 console.print(f"  {j}. {ep['title']}")
 
-            # Auto-select all episodes when season is auto-selected
-            if args.season:
-                sel_eps = list(range(1, len(eps)+1))
-                console.print(f"[green]Auto-selected: All episodes ({len(eps)} episodes)[/]")
-            else:
-                raw_ep = input(f"Select episodes for S{si:02d} (e.g. 1-3 or all): ").strip().lower()
-                sel_eps = list(range(1, len(eps)+1)) if raw_ep in ("all", "a") else []
-                for part in raw_ep.split(","):
-                    if "-" in part:
-                        lo, hi = part.split("-", 1)
-                        sel_eps += range(int(lo), int(hi)+1)
-                    elif part.isdigit():
-                        sel_eps.append(int(part))
+            raw_ep = input(f"Select episodes for S{si:02d} (e.g. 1-3 or all): ").strip().lower()
+            sel_eps = list(range(1, len(eps)+1)) if raw_ep in ("all", "a") else []
+            for part in raw_ep.split(","):
+                if "-" in part:
+                    lo, hi = part.split("-", 1)
+                    sel_eps += range(int(lo), int(hi)+1)
+                elif part.isdigit():
+                    sel_eps.append(int(part))
 
             folder = SERIES_FOLDER_TPL.format(title=safe, season=si, tag=args.tag)
             season_dir = os.path.join(args.output_dir, folder)
