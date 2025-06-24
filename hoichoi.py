@@ -160,7 +160,7 @@ def progress(mp4_in: str, mkv_out: str, audio_lang=None, srt_path=None, srt_lang
         console.print(out)
         sys.exit(1)
 
-def download_and_mux(manifest_url: str, out_dir: str, context: dict, captions: list, audio_langs: list, maxc: int, mp4c: int):
+def download_and_mux(manifest_url: str, out_dir: str, context: dict, captions: list, audio_langs: list, maxc: int, mp4c: int, preferred_resolution=None):
     """Download stream and mux subtitles/audio into MKV."""
     start = time.time()
     os.makedirs(out_dir, exist_ok=True)
@@ -169,6 +169,8 @@ def download_and_mux(manifest_url: str, out_dir: str, context: dict, captions: l
     dl.main.max_connections = maxc
     dl.main.mp4_connections = mp4c
     dl.main.output_name = "temp_vid"
+    if preferred_resolution:
+        dl.main.preferred_resolution = preferred_resolution
     asyncio.run(dl.main())
 
     mp4_in = os.path.join(out_dir, "temp_vid.mp4")
@@ -224,6 +226,7 @@ def main():
     parser.add_argument("-c", "--max-connections", type=int, default=dl.DEFAULT_MAX_CONNECTIONS)
     parser.add_argument("--mp4-connections", type=int, default=dl.DEFAULT_MP4_CONNECTIONS)
     parser.add_argument("--tag", default=DEFAULT_TAG)
+    parser.add_argument("-r", "--resolution", help="Auto-select resolution (e.g., 720, 1080) without manual selection")
     args = parser.parse_args()
 
     try:
@@ -343,7 +346,7 @@ def main():
 
                 # Standard HLS path
                 try:
-                    download_and_mux(ep["manifest"], season_dir, base, caps, auds, args.max_connections, args.mp4_connections)
+                    download_and_mux(ep["manifest"], season_dir, base, caps, auds, args.max_connections, args.mp4_connections, args.resolution)
                 except Exception as e:
                     console.print(f"[red]Failed: {e}[/]")
 
@@ -400,7 +403,7 @@ def main():
 
         caps = fetch_captions(cid)
         auds = fetch_audio_languages(cid)
-        download_and_mux(manifest, args.output_dir, {"type": "movie", "title": safe, "year": year, "tag": args.tag}, caps, auds, args.max_connections, args.mp4_connections)
+        download_and_mux(manifest, args.output_dir, {"type": "movie", "title": safe, "year": year, "tag": args.tag}, caps, auds, args.max_connections, args.mp4_connections, args.resolution)
 
 if __name__ == "__main__":
     main()

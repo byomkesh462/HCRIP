@@ -105,6 +105,7 @@ async def parse_variants(master_url: str, master_text: str) -> List[Tuple[int,in
     return variants
 
 async def select_variant(variants):
+    # Display available tracks
     table = Table(title="Found Tracks", show_header=True, header_style="bold magenta")
     table.add_column("Index", style="cyan", no_wrap=True)
     table.add_column("Resolution", justify="center")
@@ -118,8 +119,45 @@ async def select_variant(variants):
     console.print(table)
     console.print()  # blank line for spacing
 
+    # Check if preferred resolution is set
+    preferred_res = getattr(main, "preferred_resolution", None)
+    if preferred_res:
+        # Convert resolution like "1080" to "1920x1080" format for matching
+        target_height = int(preferred_res)
+        
+        # First try exact match
+        for variant in variants:
+            _, _, res, _, _, _ = variant
+            if "x" in res:
+                _, height = map(int, res.split("x"))
+                if height == target_height:
+                    console.print(f"[green]Selected {res} (exact match for {preferred_res}p)[/]\n")
+                    return variant
+        
+        # If no exact match, find closest resolution
+        closest = None
+        min_diff = float('inf')
+        for variant in variants:
+            _, _, res, _, _, _ = variant
+            if "x" in res:
+                _, height = map(int, res.split("x"))
+                diff = abs(height - target_height)
+                if diff < min_diff:
+                    min_diff = diff
+                    closest = variant
+        
+        if closest:
+            _, _, res, _, _, _ = closest
+            console.print(f"[yellow]Selected {res} (closest match to {preferred_res}p)[/]\n")
+            return closest
+        
+        # Fallback to highest quality if no resolution could be parsed
+        console.print(f"[yellow]Could not find matching resolution, defaulting to highest quality[/]\n")
+        return variants[0]
+
+    # If no preferred resolution, ask user to select
     choice = None
-    valid  = [str(i) for i in range(1, len(variants)+1)]
+    valid = [str(i) for i in range(1, len(variants)+1)]
     while choice not in valid:
         choice = console.input(f"[bold green]Select stream[/] [1–{len(variants)}]: ")
     console.print()  # blank line
