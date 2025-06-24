@@ -1,0 +1,4 @@
+movie.json
+series.json
+__pycache__/
+*.pyc
