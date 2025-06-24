@@ -227,6 +227,7 @@ def main():
     parser.add_argument("--mp4-connections", type=int, default=dl.DEFAULT_MP4_CONNECTIONS)
     parser.add_argument("--tag", default=DEFAULT_TAG)
     parser.add_argument("-r", "--resolution", help="Auto-select resolution (e.g., 720, 1080) without manual selection")
+    parser.add_argument("-s", "--season", help="Auto-select season(s) (e.g., 1, 2, or 'all') without manual selection")
     args = parser.parse_args()
 
     try:
@@ -259,8 +260,27 @@ def main():
         for i in range(1, len(seasons) + 1):
             console.print(f"  {i}. Season {i:02d}")
 
-        raw = input("Select seasons (e.g. 1,3 or all): ").strip().lower()
-        sel_seasons = list(range(1, len(seasons)+1)) if raw in ("all", "a") else [int(x) for x in re.split(r"[,\s]+", raw) if x.isdigit()]
+        # Auto-select seasons if -s parameter is provided
+        if args.season:
+            season_input = args.season.strip().lower()
+            if season_input in ("all", "a"):
+                sel_seasons = list(range(1, len(seasons)+1))
+                console.print(f"[green]Auto-selected: All seasons ({len(seasons)} seasons)[/]")
+            else:
+                try:
+                    season_num = int(season_input)
+                    if 1 <= season_num <= len(seasons):
+                        sel_seasons = [season_num]
+                        console.print(f"[green]Auto-selected: Season {season_num:02d}[/]")
+                    else:
+                        console.print(f"[red]Error: Season {season_num} not available. Available seasons: 1-{len(seasons)}[/]")
+                        sys.exit(1)
+                except ValueError:
+                    console.print(f"[red]Error: Invalid season format '{args.season}'. Use a number (1, 2, etc.) or 'all'[/]")
+                    sys.exit(1)
+        else:
+            raw = input("Select seasons (e.g. 1,3 or all): ").strip().lower()
+            sel_seasons = list(range(1, len(seasons)+1)) if raw in ("all", "a") else [int(x) for x in re.split(r"[,\s]+", raw) if x.isdigit()]
 
         for si in sel_seasons:
             eps = seasons[si-1]["episodes"]
@@ -268,14 +288,19 @@ def main():
             for j, ep in enumerate(eps, start=1):
                 console.print(f"  {j}. {ep['title']}")
 
-            raw_ep = input(f"Select episodes for S{si:02d} (e.g. 1-3 or all): ").strip().lower()
-            sel_eps = list(range(1, len(eps)+1)) if raw_ep in ("all", "a") else []
-            for part in raw_ep.split(","):
-                if "-" in part:
-                    lo, hi = part.split("-", 1)
-                    sel_eps += range(int(lo), int(hi)+1)
-                elif part.isdigit():
-                    sel_eps.append(int(part))
+            # Auto-select all episodes when season is auto-selected
+            if args.season:
+                sel_eps = list(range(1, len(eps)+1))
+                console.print(f"[green]Auto-selected: All episodes ({len(eps)} episodes)[/]")
+            else:
+                raw_ep = input(f"Select episodes for S{si:02d} (e.g. 1-3 or all): ").strip().lower()
+                sel_eps = list(range(1, len(eps)+1)) if raw_ep in ("all", "a") else []
+                for part in raw_ep.split(","):
+                    if "-" in part:
+                        lo, hi = part.split("-", 1)
+                        sel_eps += range(int(lo), int(hi)+1)
+                    elif part.isdigit():
+                        sel_eps.append(int(part))
 
             folder = SERIES_FOLDER_TPL.format(title=safe, season=si, tag=args.tag)
             season_dir = os.path.join(args.output_dir, folder)
