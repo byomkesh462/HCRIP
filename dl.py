@@ -21,6 +21,7 @@ from rich.progress import (
     TimeRemainingColumn
 )
 from rich.console import Console
+from rich import box
 
 # Optional M3U8 support
 try:
@@ -106,9 +107,9 @@ async def parse_variants(master_url: str, master_text: str) -> List[Tuple[int,in
 
 async def select_variant(variants):
     # Display available tracks
-    table = Table(title="Found Tracks", show_header=True, header_style="bold magenta")
+    table = Table(title="Found Tracks", show_header=True, header_style="bold magenta", box=box.ROUNDED)
     table.add_column("Index", style="cyan", no_wrap=True)
-    table.add_column("Resolution", justify="center")
+    table.add_column("Resolution", justify="right")
     table.add_column("FPS", justify="right")
     table.add_column("Bitrate (Kbps)", justify="right")
     table.add_column("Codecs", overflow="fold")
