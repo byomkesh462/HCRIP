@@ -242,6 +242,7 @@ def main():
     parser.add_argument("--tag", default=DEFAULT_TAG)
     parser.add_argument("-r", "--resolution", help="Auto-select resolution (e.g., 720, 1080) without manual selection")
     parser.add_argument("-s", "--season", help="Auto-select season(s) (e.g., 1, 2, or 'all') without manual selection")
+    parser.add_argument("-e", "--episode", help="Auto-select episode(s) (e.g., 1, 2-8, or 'all') without manual selection")
     args = parser.parse_args()
 
     try:
@@ -302,14 +303,48 @@ def main():
             for j, ep in enumerate(eps, start=1):
                 console.print(f"  {j}. {ep['title']}")
 
-            raw_ep = input(f"Select episodes for S{si:02d} (e.g. 1-3 or all): ").strip().lower()
-            sel_eps = list(range(1, len(eps)+1)) if raw_ep in ("all", "a") else []
-            for part in raw_ep.split(","):
-                if "-" in part:
-                    lo, hi = part.split("-", 1)
-                    sel_eps += range(int(lo), int(hi)+1)
-                elif part.isdigit():
-                    sel_eps.append(int(part))
+            # Auto-select episodes if -e parameter is provided
+            if args.episode:
+                episode_input = args.episode.strip().lower()
+                if episode_input in ("all", "a"):
+                    sel_eps = list(range(1, len(eps)+1))
+                    console.print(f"[green]Auto-selected: All episodes ({len(eps)} episodes) for Season {si:02d}[/]")
+                else:
+                    sel_eps = []
+                    try:
+                        # Handle range format (e.g., "2-8")
+                        if "-" in episode_input:
+                            start, end = episode_input.split("-", 1)
+                            start_ep = int(start.strip())
+                            end_ep = int(end.strip())
+                            if 1 <= start_ep <= len(eps) and 1 <= end_ep <= len(eps) and start_ep <= end_ep:
+                                sel_eps = list(range(start_ep, end_ep + 1))
+                                console.print(f"[green]Auto-selected: Episodes {start_ep}-{end_ep} for Season {si:02d}[/]")
+                            else:
+                                console.print(f"[red]Error: Episode range {start_ep}-{end_ep} not valid for Season {si:02d}. Available episodes: 1-{len(eps)}[/]")
+                                sys.exit(1)
+                        # Handle single episode format (e.g., "1")
+                        else:
+                            episode_num = int(episode_input)
+                            if 1 <= episode_num <= len(eps):
+                                sel_eps = [episode_num]
+                                console.print(f"[green]Auto-selected: Episode {episode_num} for Season {si:02d}[/]")
+                            else:
+                                console.print(f"[red]Error: Episode {episode_num} not available for Season {si:02d}. Available episodes: 1-{len(eps)}[/]")
+                                sys.exit(1)
+                    except ValueError:
+                        console.print(f"[red]Error: Invalid episode format '{args.episode}'. Use a number (1), range (2-8), or 'all'[/]")
+                        sys.exit(1)
+            else:
+                # Manual episode selection (original behavior)
+                raw_ep = input(f"Select episodes for S{si:02d} (e.g. 1-3 or all): ").strip().lower()
+                sel_eps = list(range(1, len(eps)+1)) if raw_ep in ("all", "a") else []
+                for part in raw_ep.split(","):
+                    if "-" in part:
+                        lo, hi = part.split("-", 1)
+                        sel_eps += range(int(lo), int(hi)+1)
+                    elif part.isdigit():
+                        sel_eps.append(int(part))
 
             folder = SERIES_FOLDER_TPL.format(title=safe, season=si, tag=args.tag)
             season_dir = os.path.join(args.output_dir, folder)
