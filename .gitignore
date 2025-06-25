@@ -1,4 +1,7 @@
-movie.json
-series.json
+# Ignore all JSON files except config.json
+*.json
+!config.json
+
+# Python related ignores
 __pycache__/
 *.pyc
